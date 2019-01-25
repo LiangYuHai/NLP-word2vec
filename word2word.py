@@ -1,6 +1,7 @@
 from data_process import Word
 import collections
 import codecs
+from sklearn.decomposition import PCA
 class Word2Word:
     def __init__(self):
         self.data=Word().data
@@ -49,6 +50,11 @@ class Word2Word:
             vector_matrix.append(temp)
         return vector_matrix
 
+    def dimensionality_reduction(self,vector_matrix):
+        pca=PCA(n_components=100)
+        low_embedding=pca.fit_transform(vector_matrix)
+        return low_embedding
+
     def save_word_vector(self,all_words,vector_matrix):
         output=codecs.open(self.path,'w','utf-8')
         for i in range(len(all_words)):
@@ -59,7 +65,8 @@ class Word2Word:
         all_words=self.all_words()
         word2word_dict=self.generate_word_dict()
         vector_matrix=self.generate_vector_matrix(all_words,word2word_dict)
-        self.save_word_vector(all_words,vector_matrix)
+        low_embedding=self.dimensionality_reduction(vector_matrix)
+        self.save_word_vector(all_words,low_embedding)
 
 word2word=Word2Word()
 word2word.get_vector()
