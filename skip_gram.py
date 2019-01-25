@@ -36,8 +36,8 @@ class Skip_Gram:
         return word2id,id2word,train_data
 
     def generate_batch(self,train_data):
-        np_x=np.ndarray(shape=[self.batch_size])
-        np_y=np.ndarray(shape=[self.batch_size,1])
+        np_x=np.ndarray(shape=[self.batch_size],dtype=np.int32)
+        np_y=np.ndarray(shape=[self.batch_size,1],dtype=np.int32)
         buffer=deque(maxlen=self.window_size*2+1)
 
         for i in range(self.window_size*2+1):
@@ -64,7 +64,7 @@ class Skip_Gram:
         vocabulary_size=len(word2id)
         tf_x=tf.placeholder(tf.int32,[self.batch_size])
         tf_y=tf.placeholder(tf.int32,[self.batch_size,1])
-        embedding=tf.Variable(tf.random_uniform(shape=[vocabulary_size,self.embedding_dim],minval=-1.0,maxval=1.0,dtype=tf.float32))
+        embedding=tf.Variable(tf.random_uniform(shape=[vocabulary_size,self.embedding_dim],minval=-1.0,maxval=1.0))
         word_embedding=tf.nn.embedding_lookup(embedding,tf_x)
         W=tf.get_variable('Weigth',shape=[vocabulary_size,self.embedding_dim],dtype=tf.float32,
                           initializer=tf.truncated_normal_initializer(stddev=1.0/math.sqrt(self.embedding_dim)))
@@ -79,22 +79,22 @@ class Skip_Gram:
                                        )
         )
         train_op=tf.train.AdamOptimizer(self.LR).minimize(loss)
-        norm=tf.reduce_sum(tf.sqrt(embedding),axis=0,keepdims=True)
-        normalize_embedding=embedding/norm
+        norm = tf.sqrt(tf.reduce_sum(tf.square(embedding), axis=1, keepdims=True))
+        normalize_embeddings = embedding / norm
 
         sess=tf.Session()
         init=tf.global_variables_initializer()
         sess.run(init)
 
         average_loss=0
-        for i in range(1,50001):
+        for i in range(1,5000):
             batch_x,batch_y=self.generate_batch(train_data)
             loss_,_=sess.run([loss,train_op],feed_dict={tf_x:batch_x,tf_y:batch_y})
             average_loss+=loss_
             if i%1000==0:
                 average_loss/=1000
                 print('iter:',i,"| average_loss:%.4f"%average_loss)
-        word_vertors=sess.run(normalize_embedding)
+        word_vertors=sess.run(normalize_embeddings)
         return word_vertors
 
     def save_word_vectors(self,word_vectors,id2word):

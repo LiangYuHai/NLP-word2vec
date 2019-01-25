@@ -107,7 +107,7 @@ class CBOW:
     def save_vec(self,words_vectors,id2word):
         output=codecs.open(self.output_path,'w','utf-8')
         for index,vector in enumerate(words_vectors):
-            output.write(id2word[index]+'\t'+','.join([str(item) for item in vector])+'\n')
+            output.write(id2word[index]+'\t'+','.join([item for item in vector])+'\n')
         output.close()
 
     def train(self):

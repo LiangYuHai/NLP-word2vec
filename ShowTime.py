@@ -8,7 +8,7 @@ class Show:
         self.word2vector,self.all_vectors,self.id2word = self.read(self.path)
 
     def read(self,path):
-        input=codecs.open(path,'w','utf-8')
+        input=codecs.open(path,'r','utf-8')
         word2vector=dict()
         all_vectors=[]
         id2word={}
@@ -42,7 +42,7 @@ if len(sys.argv)==2 and sys.argv[1]=='cbow':
     path='./cbow.txt'
     show=Show(path)
     word = input('输入一个词：')
-    similar_words=show.read(word)
+    similar_words=show.showtime(word)
     words=[]
     for item in similar_words:
         words.append(item[0])
@@ -52,7 +52,7 @@ if len(sys.argv)==2 and sys.argv[1]=='skip_gram':
     path='./skip_gram.txt'
     show=Show(path)
     word=input('输入一个词：')
-    similar_words = show.read(word)
+    similar_words = show.showtime(word)
     words = []
     for item in similar_words:
         words.append(item[0])
